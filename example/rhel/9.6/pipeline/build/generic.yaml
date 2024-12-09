@@ -1,0 +1,13 @@
+name: build
+runner: ${osbuild_runner}
+stages:
+  - otk.external.osbuild-make-depsolve-dnf4-rpm-stage:
+      packageset: ${packages.build}
+      #gpgkeys: ${gpgkeys.build}
+      gpgkeys:
+        otk.include: "../../common/redhat-gpgkeys.yaml"
+  - type: org.osbuild.selinux
+    options:
+      file_contexts: etc/selinux/targeted/contexts/files/file_contexts
+      labels:
+        /usr/bin/cp: system_u:object_r:install_exec_t:s0

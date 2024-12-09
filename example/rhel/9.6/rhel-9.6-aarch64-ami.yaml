@@ -1,0 +1,75 @@
+otk.version: "1"
+
+# Include common distribution definitions
+otk.include.0: "common/distro-defines.yaml"
+
+otk.define:
+  architecture: aarch64
+  default_img_size: "10 GiB"
+  filesystem:
+    modifications:
+      filename: "image.raw"
+  # XXX: apparently not possible -> "otk.include not allowed in an otk.define"
+  #gpgkeys:
+  #  build:
+  #    otk.include: "common/redhat-gpgkeys.yaml"
+  #  os:
+  #    otk.include: "common/redhat-gpgkeys.yaml"
+  packages:
+    build:
+      otk.external.osbuild-gen-depsolve-dnf4:
+        architecture: ${architecture}
+        module_platform_id: ${module_platform_id}
+        releasever: ${releasever}
+        repositories:
+          otk.include: "common/repositories/common.yaml"
+        packages:
+          include:
+            otk.op.join:
+              values:
+                - otk.include: "common/package-set/platform/${architecture}-uefi-build-include.yaml"
+                - otk.include: "common/package-set/common/build-ami-include.yaml"
+          exclude: []
+    os:
+      otk.external.osbuild-gen-depsolve-dnf4:
+        architecture: ${architecture}
+        module_platform_id: ${module_platform_id}
+        releasever: ${releasever}
+        repositories:
+          otk.include: "common/repositories/common.yaml"
+        packages:
+          include:
+            otk.op.join:
+              values:
+                - otk.include: "common/package-set/platform/${architecture}-uefi-boot-include.yaml"
+                - otk.include: "common/package-set/common/ami-include.yaml"
+          exclude:
+            otk.include: "common/package-set/common/ami-exclude.yaml"
+  kernel:
+    cmdline:
+      # XXX: apparently not possible -> "otk.include not allowed in an otk.define"
+      #otk.include: "common/ami/${architecture}-kernel-cmdline.yaml"
+      "console=tty0 console=ttyS0,115200n8 nvme_core.io_timeout=4294967295 iommu.strict=0"
+    package:
+      otk.external.osbuild-get-dnf4-package-info:
+        packageset: ${packages.os}
+        packagename: "kernel"
+
+otk.include: "common/partition-table/${architecture}/default.yaml"
+
+otk.target.osbuild:
+  pipelines:
+    - otk.include: "pipeline/build/generic.yaml"
+    - name: os
+      build: name:build
+      stages:
+        otk.op.join:
+          values:
+            - otk.include: "pipeline/ami/os/common-part.yaml"
+            - - otk.include: "fragment/selinux.yaml"
+    - otk.include: "pipeline/image/${architecture}.yaml"
+  sources:
+    otk.external.osbuild-make-depsolve-dnf4-curl-source:
+      packagesets:
+        - ${packages.build}
+        - ${packages.os}

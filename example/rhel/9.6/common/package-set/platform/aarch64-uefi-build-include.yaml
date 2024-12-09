@@ -1,0 +1,3 @@
+# This is intentionally empty, but exists to allow for common package set inclusion
+# in the payload and build pipelines, regardless of the platform.
+[]

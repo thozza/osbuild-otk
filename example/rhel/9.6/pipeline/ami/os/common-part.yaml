@@ -1,0 +1,105 @@
+# "common" part of the AMI OS pipeline
+otk.op.join:
+  values:
+    - - otk.include: "../../../fragment/kernel-cmdline.yaml"
+      - otk.external.osbuild-make-depsolve-dnf4-rpm-stage:
+          packageset: ${packages.os}
+          #gpgkeys: ${gpgkeys.os}
+          gpgkeys:
+            otk.include: "../../../common/redhat-gpgkeys.yaml"
+      - otk.include: "../../../fragment/fix-bls/empty-prefix.yaml"
+      - otk.include: "../../../fragment/locale.yaml"
+      - type: org.osbuild.keymap
+        options:
+          keymap: us
+          x11-keymap:
+            layouts:
+              - us
+      - otk.include: "../../../fragment/timezone.yaml"
+      - type: org.osbuild.chrony
+        options:
+          servers:
+            - hostname: 169.254.169.123
+              minpoll: 4
+              maxpoll: 4
+              iburst: true
+              prefer: true
+          leapsectz: ''
+      - type: org.osbuild.sysconfig
+        options:
+          kernel:
+            update_default: true
+            default_kernel: kernel
+          network:
+            networking: true
+            no_zero_conf: true
+          network-scripts:
+            ifcfg:
+              eth0:
+                bootproto: dhcp
+                device: eth0
+                ipv6init: false
+                onboot: true
+                peerdns: true
+                type: Ethernet
+                userctl: true
+      - type: org.osbuild.systemd-logind
+        options:
+          filename: 00-getty-fixes.conf
+          config:
+            Login:
+              NAutoVTs: 0
+      - type: org.osbuild.cloud-init
+        options:
+          filename: 00-rhel-default-user.cfg
+          config:
+            system_info:
+              default_user:
+                name: ec2-user
+      - type: org.osbuild.modprobe
+        options:
+          filename: blacklist-nouveau.conf
+          commands:
+            - command: blacklist
+              modulename: nouveau
+      - type: org.osbuild.modprobe
+        options:
+          filename: blacklist-amdgpu.conf
+          commands:
+            - command: blacklist
+              modulename: amdgpu
+    # XXX: conditional on architecture
+    - otk.include: dracut-conf-part-${architecture}.yaml
+    - - type: org.osbuild.systemd.unit
+        options:
+          unit: nm-cloud-setup.service
+          dropin: 10-rh-enable-for-ec2.conf
+          config:
+            Service:
+              Environment:
+                - key: NM_CLOUD_SETUP_EC2
+                  value: 'yes'
+      - type: org.osbuild.authselect
+        options:
+          profile: sssd
+      - type: org.osbuild.sshd.config
+        options:
+          config:
+            PasswordAuthentication: false
+      - otk.external.osbuild-make-fstab-stage:
+          ${filesystem}
+      - otk.include: ../../../fragment/grub2/${architecture}.yaml
+      - type: org.osbuild.systemd
+        options:
+          enabled_services:
+            - sshd
+            - NetworkManager
+            - nm-cloud-setup.service
+            - nm-cloud-setup.timer
+            - cloud-init
+            - cloud-init-local
+            - cloud-config
+            - cloud-final
+            - reboot.target
+            - tuned
+          default_target: multi-user.target

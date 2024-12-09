@@ -1,0 +1,5 @@
+- id: "AppStream"
+  baseurl: "https://rpmrepo.osbuild.org/v2/mirror/rhvpn/el9/el9-${architecture}-appstream-n9.6-20241115"
+- id: "BaseOS"
+  baseurl: "https://rpmrepo.osbuild.org/v2/mirror/rhvpn/el9/el9-${architecture}-baseos-n9.6-20241115"
+

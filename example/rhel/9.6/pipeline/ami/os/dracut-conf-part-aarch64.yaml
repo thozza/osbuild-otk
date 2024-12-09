@@ -1,0 +1,6 @@
+- type: org.osbuild.dracut.conf
+  options:
+    filename: sgdisk.conf
+    config:
+      install_items:
+        - sgdisk

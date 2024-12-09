@@ -1,0 +1,2 @@
+- id: "HighAvailability"
+  baseurl: "https://rpmrepo.osbuild.org/v2/mirror/rhvpn/el9/el9-${architecture}-ha-n9.6-20241115"

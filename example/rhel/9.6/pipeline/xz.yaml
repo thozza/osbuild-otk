@@ -1,0 +1,15 @@
+name: archive
+build: "name:build"
+stages:
+  - type: org.osbuild.xz
+    options:
+      # XXX: this should be possible to parametrize
+      filename: image.raw.xz
+    inputs:
+      tree:
+        type: org.osbuild.files
+        origin: org.osbuild.pipeline
+        references:
+          # XXX: this should be possible to parametrize
+          name:image:
+            file: "disk.img"

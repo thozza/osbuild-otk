@@ -1,0 +1,9 @@
+otk.define:
+  releasever: "9.6"
+  module_platform_id: "el9"
+  osbuild_runner: "org.osbuild.rhel96"
+  vendor: "redhat"
+  modifications:
+    locale: en_US.UTF-8
+    timezone: UTC
+    selinux_policy: "targeted"

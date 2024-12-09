@@ -1,0 +1,76 @@
+# https://github.com/osbuild/images/blob/main/pkg/distro/rhel/rhel9/sap.go
+- type: org.osbuild.selinux.config
+  options:
+    state: permissive
+
+# RHBZ#1960617
+- type: org.osbuild.tuned
+  options:
+    profiles:
+      - sap-hana
+
+- type: org.osbuild.tmpfilesd
+  options:
+    config:
+      - path: /tmp/.sap*
+        type: x
+      - path: /tmp/.hdb*lock
+        type: x
+      - path: /tmp/.trex*lock
+        type: x
+    filename: sap.conf
+
+# RHBZ#1959963
+- type: org.osbuild.pam.limits.conf
+  options:
+    config:
+      - item: nofile
+        type: hard
+        value: 1048576
+        domain: "@sapsys"
+      - item: nofile
+        type: soft
+        value: 1048576
+        domain: "@sapsys"
+      - item: nofile
+        type: hard
+        value: 1048576
+        domain: "@dba"
+      - item: nofile
+        type: soft
+        value: 1048576
+        domain: "@dba"
+      - item: nproc
+        type: hard
+        value: unlimited
+        domain: "@sapsys"
+      - item: nproc
+        type: soft
+        value: unlimited
+        domain: "@sapsys"
+      - item: nproc
+        type: hard
+        value: unlimited
+        domain: "@dba"
+      - item: nproc
+        type": soft
+        value": unlimited
+        domain": "@dba"
+    filename: 99-sap.conf
+
+# RHBZ#1959962
+- type: org.osbuild.sysctld
+  options:
+    config:
+      - key: kernel.pid_max
+        value: 4194304
+      - key: vm.max_map_count
+        value: 2147483647
+    filename: sap.conf
+
+# E4S/EUS
+- type: org.osbuild.dnf.config
+  options:
+    variables:
+      - name: releasever
+        value: ${releasever}

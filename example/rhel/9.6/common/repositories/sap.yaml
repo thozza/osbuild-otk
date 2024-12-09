@@ -1,0 +1,4 @@
+- id: "SAP"
+  baseurl: "https://rpmrepo.osbuild.org/v2/mirror/rhvpn/el9/el9-${architecture}-sap-n9.6-20241115"
+- id: "SAPHANA"
+  baseurl: "https://rpmrepo.osbuild.org/v2/mirror/rhvpn/el9/el9-${architecture}-saphana-n9.6-20241115"

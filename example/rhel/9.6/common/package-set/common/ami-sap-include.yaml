@@ -1,0 +1,4 @@
+otk.op.join:
+  - otk.include: "sap-include.yaml"
+  # https://github.com/osbuild/images/blob/048c8c6745068f7a91c8fe48422b64d37d34c5ff/pkg/distro/rhel/rhel9/ami.go#L254
+  - - "libcanberra-gtk2"

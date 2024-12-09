@@ -1,0 +1,3 @@
+# https://github.com/osbuild/images/blob/048c8c6745068f7a91c8fe48422b64d37d34c5ff/pkg/platform/ppc64le.go#L41-L46
+- "grub2-ppc64le"
+- "grub2-ppc64le-modules"
